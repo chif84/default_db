@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  mssql_db:
+    container_name: mssql
+    ## Сервис будет стартовать автоматически
+    restart: always
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${MSSQL_SA_PASSWORD}
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
+      - MSSQL_DB_NAME=${MSSQL_DB_NAME}
+      - MSSQL_DB_HOST=${MSSQL_DB_HOST}
+    ports:
+      ## Если на хосте установлены другие инстансы MsSql можно изменить биндинг портов
+      - "1433:1433"
+    build:
+      context: .
+      dockerfile: ./mssql_db.Dockerfile
+    volumes:
+      ## Внимание: пробел между ":" и "/" может стать причной ошибки
+      - sqlvolumeMsSql:/var/opt/mssql/data
+
+volumes:
+  sqlvolumeMsSql:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ./${MSSQL_DATA_FOLDER}
